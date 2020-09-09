@@ -1,0 +1,20 @@
+<template>
+    <div>
+        <el-button round @click="logout">圆角按钮</el-button>
+    </div>
+</template>
+
+<script>
+export default {
+  methods: {
+    logout () {
+      window.sessionStorage.clear()
+      this.$router.push('/login')
+    }
+  }
+}
+</script>
+
+<style lang='less' scoped>
+
+</style>
