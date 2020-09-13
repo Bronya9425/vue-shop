@@ -333,6 +333,7 @@ export default {
       // 隐藏对话框
       this.setdialogVisible = false
     },
+    // 监听分配对话框的关闭 清空上次数据 使其默认为空
     setroleDialogClose () {
       this.userInfo = ''
       this.selectRolesId = ''
