@@ -15,7 +15,7 @@
         <!-- 侧边栏内容 -->
         <div class="tog-button" @click="checkis">|||</div>
         <el-menu background-color="#b3c0d1" text-color="black" active-text-color="#00FFFF" unique-opened :collapse="iscollapse" router :default-active="actpath">
-          <el-submenu :index="item.id" v-for="item in menulist" :key="item.id">
+          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <template slot="title">
               <i :class="iconset[item.id]"></i>
               <span>{{item.authName}}</span>
@@ -27,8 +27,10 @@
                 <i :class="iconset[item.id]"></i>
                 {{item.children[0].authName}}
               </template>
-              <el-menu-item :index="'/' + item.path" class="el-icon-caret-right" @click="savestat('/' + item.path)">{{item.authName.slice(0,2)}}{{item.id}}</el-menu-item>
-              <!-- <el-menu-item :index="'/' + item.path + 1" class="el-icon-caret-right">{{item.authName.slice(0,2)}}{{item.id + 1}}</el-menu-item> -->
+              <el-menu-item :index="'/' + subItem.path" v-for="subItem in item.children" :key="subItem.id" @click="savestat('/' + subItem.path)">
+                <i :class="iconset[subItem.id]"></i>
+                {{subItem.authName}}
+              </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
         </el-menu>
@@ -64,7 +66,7 @@ export default {
   // 生命周期函数
   created () {
     this.getMenuList()
-    this.actpath = window.sessionStorage.setItem('actpath')// 得到保存的值
+    this.actpath = window.sessionStorage.setItem('actpath', this.actpath)// 得到保存的值
   },
   methods: {
     logout () {
@@ -72,10 +74,11 @@ export default {
       this.$router.push('/login')
     },
     async getMenuList () {
+      // 获取所有菜单
       const { data: res } = await this.$http.get('menus')
       if (res.meta.status !== 200) return this.message.error(res.meta.msg)
       this.menulist = res.data
-      console.log(res)
+      console.log(this.menulist)
     },
     checkis () {
       // 通过取反值来设置菜单栏的展开与折叠

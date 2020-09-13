@@ -42,14 +42,8 @@
             <!-- 删除按钮 -->
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUserById(scope.row.id)"></el-button>
             <!-- 分配按钮 -->
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="进行分配"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-tooltip class="item" effect="dark" content="进行分配" placement="top" :enterable="false">
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="setRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -95,12 +89,28 @@
         <el-button type="primary" @click="editUser">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配角色的对话框 -->
+      <el-dialog title="用户角色分配" :visible.sync="setdialogVisible" width="50%" @close=setroleDialogClose>
+        <div>
+          <p>当前的用户:{{userInfo.username}}</p>
+          <p>当前的角色:{{userInfo.role_name}}</p>
+          <p>分配新角色
+            <el-select v-model="selectRolesId" placeholder="请选择">
+              <el-option v-for="item in roleList" :key="item.id" :label="item.roleName" :value="item.id"></el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setdialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 分页效果实现 -->
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="queryInfo.pagenum"
-        :page-sizes="[1, 3, 4, 10]"
+        :page-sizes="[1, 2, 4, 10]"
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="toatal"
@@ -183,7 +193,15 @@ export default {
           { required: true, message: '手机不能为空', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
-      }
+      },
+      // 控制分配角色对话框的显示与隐藏
+      setdialogVisible: false,
+      // 需要被分配的用户信息
+      userInfo: {},
+      // 拿到的所有角色的数据列表
+      roleList: [],
+      // 以选中将要分配的角色id值
+      selectRolesId: ''
     }
   },
   created () {
@@ -198,7 +216,7 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取失败')
       this.toatal = res.data.total
       this.userlist = res.data.users
-      console.log(res)
+      console.log(this.userlist)
     },
     // 监听pagesize改变的事件
     handleSizeChange (newsize) {
@@ -293,6 +311,31 @@ export default {
       // 刷新用户列表数据
       this.getUserList()
       this.$message.success('删除成功')
+    },
+    // 分配角色的对话框
+    async setRole (userdata) {
+      this.userInfo = userdata
+      // 展示对话框之前获取所有角色的列表
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) return this.$message.error('获取失败')
+      this.roleList = res.data
+      // console.log(this.roleList)
+      this.setdialogVisible = true
+    },
+    // 点击确认按钮分配角色
+    async saveRoleInfo () {
+      if (!this.selectRolesId) return this.$message.error('请选择要分配的角色')
+      const { data: res } = await this.$http.put(`users/${this.userInfo.id}/role`, { rid: this.selectRolesId })
+      if (res.meta.status !== 200) return this.$message.error('分配失败')
+      this.$message.success('更新角色成功')
+      // 刷新列表数据
+      this.getUserList()
+      // 隐藏对话框
+      this.setdialogVisible = false
+    },
+    setroleDialogClose () {
+      this.userInfo = ''
+      this.selectRolesId = ''
     }
   }
 }

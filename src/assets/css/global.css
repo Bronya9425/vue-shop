@@ -5,6 +5,7 @@ body,
     height: 100%;
     margin: 0;
     padding: 0;
+    min-width: 1400px;
     
 }
 
@@ -24,5 +25,5 @@ body,
 
 .el-pagination {
     margin-top: 32px;
-    margin-left: 30%;
+    margin-left: 23%;
 }

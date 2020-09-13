@@ -6,7 +6,7 @@ import './plugins/element.js'
 import './assets/css/global.css'
 
 import axios from 'axios'
-axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/'// 服务器地址
+axios.defaults.baseURL = 'http://www.ysqorz.top:8888/api/private/v1/'// 服务器地址
 axios.interceptors.request.use(config => {
   // 通过axios请求拦截器添加token，保证有获取数据的权限
   console.log(config)
